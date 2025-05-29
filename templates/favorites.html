@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Your Favorites</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Font Awesome CDN for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>Movie Recommender</h1>
+            <nav>
+                <a href="{{ url_for('home') }}" class="btn">Home</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+            <h2>Your Favorites</h2>
+            {% if liked_movies %}
+            <ul class="recommendations">
+                {% for item in liked_movies %}
+                <li>
+                    {{ item.movie_title }}
+                    <form action="{{ url_for('remove_favorite', movie_id=item.id) }}" method="post"
+                        style="display:inline;">
+                        <button type="submit" class="btn btn-danger" title="Remove favorite">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>You haven't liked any movies yet.</p>
+            {% endif %}
+        </div>
+    </main>
+</body>
+
+</html>

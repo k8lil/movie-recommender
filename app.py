@@ -112,6 +112,25 @@ def like_movie():
 
     return jsonify({'status': 'success', 'message': f'You liked "{movie_title}".'})
 
+@app.route('/favorites')
+@login_required
+def favorites():
+    liked_movies = UserPreference.query.filter_by(user_id=current_user.id).all()
+    return render_template('favorites.html', liked_movies=liked_movies)
+
+@app.route('/remove_favorite/<int:movie_id>', methods=['POST'])
+@login_required
+def remove_favorite(movie_id):
+    preference = UserPreference.query.filter_by(user_id=current_user.id, id=movie_id).first()
+
+    if preference:
+        db.session.delete(preference)
+        db.session.commit()
+        flash('Movie removed from favorites.', 'success')
+    else:
+        flash('Favorite not found.', 'error')
+
+    return redirect(url_for('favorites'))
 
 if __name__ == '__main__':
     app.run(debug=True)
