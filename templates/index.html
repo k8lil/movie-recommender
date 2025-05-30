@@ -6,22 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Movie Recommender</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="..." crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
     <header>
         <div class="container">
             <h1>Movie Recommender</h1>
-            <nav>
-                {% if current_user.is_authenticated %}
-                <span>Welcome, {{ current_user.username }}!</span>
-                <a href="{{ url_for('favorites') }}" class="btn btn-secondary">Favorites</a>
-                <a href="{{ url_for('logout') }}" class="btn">Logout</a>
-                {% else %}
-                <a href="{{ url_for('login') }}" class="btn">Login</a>
-                <a href="{{ url_for('register') }}" class="btn btn-secondary">Register</a>
-                {% endif %}
-            </nav>
+            <div class="header-right">
+                <form action="{{ url_for('search') }}" method="get" class="header-search-form">
+                    <input type="text" name="query" placeholder="Search movies..." required>
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+                <nav>
+                    {% if current_user.is_authenticated %}
+                    <span>Welcome, {{ current_user.username }}!</span>
+                    <a href="{{ url_for('favorites') }}" class="btn btn-secondary">Favorites</a>
+                    <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="btn">Login</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-secondary">Register</a>
+                    {% endif %}
+                </nav>
+            </div>
         </div>
     </header>
 
@@ -31,9 +39,9 @@
             <div class="flash-messages">
                 {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                    {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                    {% endfor %}
+                {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
                 {% endif %}
                 {% endwith %}
             </div>
@@ -52,10 +60,23 @@
             <ul class="recommendations">
                 {% for movie in recommendations %}
                 <li>
-                    {{ movie }}
-                    <form action="{{ url_for('like_movie') }}" method="POST" style="display:inline;">
-                        <input type="hidden" name="movie_title" value="{{ movie }}">
-                        <button type="submit" class="like-btn">❤️</button>
+                    {% if movie.poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w92{{ movie.poster_path }}" alt="{{ movie.title }} poster" />
+                    {% else %}
+                    <div class="no-image-placeholder">No Image</div>
+                    {% endif %}
+                    <div class="movie-info">
+                        <span class="movie-title">{{ movie.title }}</span>
+                        {% if movie.release_date %}
+                        <span class="release-year">({{ movie.release_date[:4] }})</span>
+                        {% endif %}
+                        {% if movie.overview %}
+                        <p class="movie-overview">{{ movie.overview }}</p>
+                        {% endif %}
+                    </div>
+                    <form action="{{ url_for('like_movie') }}" method="POST" class="like-form">
+                        <input type="hidden" name="movie_title" value="{{ movie.title }}">
+                        <button type="submit" class="like-btn" title="Like this movie">❤️</button>
                     </form>
                 </li>
                 {% endfor %}
@@ -82,7 +103,7 @@
             const likeButtons = document.querySelectorAll('.like-btn');
             if (likeButtons.length > 0) {
                 likeButtons.forEach(button => {
-                    button.addEventListener('click', function(event) {
+                    button.addEventListener('click', function (event) {
                         event.preventDefault(); // prevent form submission/reload
 
                         const form = this.closest('form');
@@ -95,29 +116,29 @@
                                 'X-Requested-With': 'XMLHttpRequest'
                             }
                         })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (!data.message) return; // no message to show
+                            .then(response => response.json())
+                            .then(data => {
+                                if (!data.message) return; // no message to show
 
-                            // Show flash message
-                            const flashContainer = document.querySelector('.flash-messages');
-                            if (!flashContainer) return;
+                                // Show flash message
+                                const flashContainer = document.querySelector('.flash-messages');
+                                if (!flashContainer) return;
 
-                            const flashDiv = document.createElement('div');
-                            flashDiv.className = `flash ${data.status}`;
-                            flashDiv.textContent = data.message;
-                            flashContainer.appendChild(flashDiv);
+                                const flashDiv = document.createElement('div');
+                                flashDiv.className = `flash ${data.status}`;
+                                flashDiv.textContent = data.message;
+                                flashContainer.appendChild(flashDiv);
 
-                            // Auto-hide after 3 seconds
-                            setTimeout(() => {
-                                flashDiv.style.transition = 'opacity 0.5s ease-out';
-                                flashDiv.style.opacity = '0';
-                                setTimeout(() => flashDiv.remove(), 500);
-                            }, 3000);
-                        })
-                        .catch(error => {
-                            console.error('Error liking movie:', error);
-                        });
+                                // Auto-hide after 3 seconds
+                                setTimeout(() => {
+                                    flashDiv.style.transition = 'opacity 0.5s ease-out';
+                                    flashDiv.style.opacity = '0';
+                                    setTimeout(() => flashDiv.remove(), 500);
+                                }, 3000);
+                            })
+                            .catch(error => {
+                                console.error('Error liking movie:', error);
+                            });
                     });
                 });
             }

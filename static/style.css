@@ -232,3 +232,132 @@ main {
   color: #721c24;
   border: 1px solid #f5c6cb;
 }
+
+header .container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.header-search-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.header-search-form input[type="text"] {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-weight: 600;
+}
+
+.header-search-form button {
+    background-color: #4caf50;
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.header-search-form button:hover {
+    background-color: #45a049;
+}
+
+.recommendations {
+  list-style: none;
+  padding: 0;
+  margin: 2em 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+}
+
+.recommendations li {
+  display: flex;
+  background: #f9f9f9;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 1em;
+  transition: transform 0.2s ease;
+}
+
+.recommendations li:hover {
+  transform: translateY(-2px);
+}
+
+.recommendations img {
+  width: 92px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.no-image-placeholder {
+  width: 92px;
+  height: 138px;
+  background: #e0e0e0;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9em;
+  border-radius: 8px;
+}
+
+.movie-info {
+  flex-grow: 1;
+  margin-left: 1em;
+}
+
+.movie-title {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #222;
+}
+
+.release-year {
+  color: #888;
+  font-size: 0.95em;
+  margin-left: 0.4em;
+}
+
+.movie-overview {
+  font-size: 0.95em;
+  color: #333;
+  margin-top: 0.5em;
+}
+
+.like-form {
+  display: flex;
+  align-items: start;
+  margin-left: auto;
+}
+
+.like-btn {
+  background: none;
+  border: none;
+  font-size: 1.4em;
+  color: #e74c3c;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.like-btn:hover {
+  transform: scale(1.2);
+}

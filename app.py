@@ -4,6 +4,9 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from models import db, User, UserPreference
 from recommendation import get_similar_movies
 from flask import jsonify
+from models import Movie
+import requests
+from flask import request, render_template
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -131,6 +134,40 @@ def remove_favorite(movie_id):
         flash('Favorite not found.', 'error')
 
     return redirect(url_for('favorites'))
+
+TMDB_API_KEY = 'e454138589053ddd5a2dd061e3e35ac5'
+
+@app.route('/search', methods=['GET'])
+def search():
+    query = request.args.get('query', '').strip()
+    if not query:
+        return render_template('index.html', message="Please enter a movie title.")
+
+    # Call TMDb API for search
+    url = 'https://api.themoviedb.org/3/search/movie'
+    params = {
+        'api_key': TMDB_API_KEY,
+        'query': query,
+        'language': 'en-US',
+        'page': 1,
+        'include_adult': False
+    }
+    response = requests.get(url, params=params)
+    if response.status_code != 200:
+        return render_template('index.html', message="Error contacting movie service. Try again later.")
+
+    data = response.json()
+    results = data.get('results', [])
+
+    movies = [{
+    'title': movie['title'],
+    'id': movie['id'],
+    'poster_path': movie['poster_path'],
+    'release_date': movie.get('release_date', ''),
+    'overview': movie.get('overview', '')
+    } for movie in results[:8]]
+
+    return render_template('index.html', recommendations=movies, input_title=query)
 
 if __name__ == '__main__':
     app.run(debug=True)
