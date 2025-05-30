@@ -141,9 +141,8 @@ TMDB_API_KEY = 'e454138589053ddd5a2dd061e3e35ac5'
 def search():
     query = request.args.get('query', '').strip()
     if not query:
-        return render_template('index.html', message="Please enter a movie title.")
+        return render_template('search_results.html', search_results=[], input_title=query)
 
-    # Call TMDb API for search
     url = 'https://api.themoviedb.org/3/search/movie'
     params = {
         'api_key': TMDB_API_KEY,
@@ -152,22 +151,69 @@ def search():
         'page': 1,
         'include_adult': False
     }
+
     response = requests.get(url, params=params)
     if response.status_code != 200:
-        return render_template('index.html', message="Error contacting movie service. Try again later.")
+        return render_template('search_results.html', search_results=[], input_title=query)
 
     data = response.json()
     results = data.get('results', [])
 
-    movies = [{
-    'title': movie['title'],
-    'id': movie['id'],
-    'poster_path': movie['poster_path'],
-    'release_date': movie.get('release_date', ''),
-    'overview': movie.get('overview', '')
-    } for movie in results[:8]]
+    search_results = [{
+        'title': movie['title'],
+        'id': movie['id'],
+        'poster_path': movie['poster_path'],
+        'release_date': movie.get('release_date', ''),
+        'overview': movie.get('overview', '')
+    } for movie in results]
 
-    return render_template('index.html', recommendations=movies, input_title=query)
+    return render_template('search_results.html', search_results=search_results, input_title=query)
+
+
+@app.route('/recommend', methods=['GET', 'POST'])
+def recommend():
+    if request.method == 'POST':
+        movie_title = request.form.get('movie')
+    else:
+        movie_title = request.args.get('movie')
+
+    if not movie_title:
+        return render_template('index.html', message="Please enter a movie title.")
+
+    # Step 1: Search for the movie
+    search_url = 'https://api.themoviedb.org/3/search/movie'
+    search_params = {
+        'api_key': TMDB_API_KEY,
+        'query': movie_title
+    }
+    search_response = requests.get(search_url, params=search_params)
+    search_data = search_response.json()
+    results = search_data.get('results')
+
+    if not results:
+        return render_template('index.html', message="Movie not found.", input_title=movie_title)
+
+    # Step 2: Get the ID of the first matching movie
+    movie_id = results[0]['id']
+
+    # Step 3: Get recommendations based on this movie ID
+    rec_url = f'https://api.themoviedb.org/3/movie/{movie_id}/recommendations'
+    rec_params = {
+        'api_key': TMDB_API_KEY,
+        'language': 'en-US',
+        'page': 1
+    }
+    rec_response = requests.get(rec_url, params=rec_params)
+    rec_data = rec_response.json()
+    recommendations = rec_data.get('results', [])  # limit to 8 results
+
+    movies = [{
+        'title': movie['title'],
+        'id': movie['id'],
+        'poster_path': movie['poster_path']
+    } for movie in recommendations]
+
+    return render_template('index.html', recommendations=movies, input_title=movie_title)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -13,23 +13,21 @@
 <body>
     <header>
         <div class="container">
-            <h1>Movie Recommender</h1>
-            <div class="header-right">
-                <form action="{{ url_for('search') }}" method="get" class="header-search-form">
-                    <input type="text" name="query" placeholder="Search movies..." required>
-                    <button type="submit"><i class="fas fa-search"></i></button>
-                </form>
-                <nav>
-                    {% if current_user.is_authenticated %}
-                    <span>Welcome, {{ current_user.username }}!</span>
-                    <a href="{{ url_for('favorites') }}" class="btn btn-secondary">Favorites</a>
-                    <a href="{{ url_for('logout') }}" class="btn">Logout</a>
-                    {% else %}
-                    <a href="{{ url_for('login') }}" class="btn">Login</a>
-                    <a href="{{ url_for('register') }}" class="btn btn-secondary">Register</a>
-                    {% endif %}
-                </nav>
-            </div>
+            <h1><a href="{{ url_for('home') }}" style="color: inherit; text-decoration: none;">Movie Recommender</a></h1>
+            <nav>
+                {% if current_user.is_authenticated %}
+                <span>Welcome, {{ current_user.username }}!</span>
+                <a href="{{ url_for('favorites') }}" class="btn btn-secondary">Favorites</a>
+                <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn">Login</a>
+                <a href="{{ url_for('register') }}" class="btn btn-secondary">Register</a>
+                {% endif %}
+            </nav>
+            <form action="{{ url_for('search') }}" method="get" class="header-search-form">
+                <input type="text" name="query" placeholder="Search movies..." required>
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
         </div>
     </header>
 
@@ -46,8 +44,8 @@
                 {% endwith %}
             </div>
 
-            <form method="POST" class="search-form">
-                <input type="text" name="movie" placeholder="Enter movie title..." value="{{ input_title }}" required />
+            <form action="{{ url_for('recommend') }}" method="POST" class="search-form">
+                <input type="text" name="movie" placeholder="Enter movie title to get recommended movies..." value="{{ input_title }}" required />
                 <button type="submit">Search</button>
             </form>
 
@@ -59,14 +57,15 @@
             <h2>Recommendations:</h2>
             <ul class="recommendations">
                 {% for movie in recommendations %}
-                <li>
+                <li class="movie-item">
                     {% if movie.poster_path %}
-                    <img src="https://image.tmdb.org/t/p/w92{{ movie.poster_path }}" alt="{{ movie.title }} poster" />
+                    <img src="https://image.tmdb.org/t/p/w200{{ movie.poster_path }}" alt="{{ movie.title }} poster"
+                        class="movie-poster" />
                     {% else %}
-                    <div class="no-image-placeholder">No Image</div>
+                    <div class="movie-poster-placeholder">No Image</div>
                     {% endif %}
                     <div class="movie-info">
-                        <span class="movie-title">{{ movie.title }}</span>
+                        <h3 class="movie-title">{{ movie.title }}</h3>
                         {% if movie.release_date %}
                         <span class="release-year">({{ movie.release_date[:4] }})</span>
                         {% endif %}
@@ -74,10 +73,6 @@
                         <p class="movie-overview">{{ movie.overview }}</p>
                         {% endif %}
                     </div>
-                    <form action="{{ url_for('like_movie') }}" method="POST" class="like-form">
-                        <input type="hidden" name="movie_title" value="{{ movie.title }}">
-                        <button type="submit" class="like-btn" title="Like this movie">❤️</button>
-                    </form>
                 </li>
                 {% endfor %}
             </ul>
@@ -87,7 +82,7 @@
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            // Auto-hide existing flash messages after 3 seconds
+            // Auto-hide flash messages after 3 seconds
             const flashMessages = document.querySelectorAll('.flash-messages .flash');
             if (flashMessages.length > 0) {
                 setTimeout(() => {
@@ -96,51 +91,7 @@
                         msg.style.opacity = '0';
                         setTimeout(() => msg.remove(), 500);
                     });
-                }, 3000);
-            }
-
-            // Handle like button clicks with AJAX
-            const likeButtons = document.querySelectorAll('.like-btn');
-            if (likeButtons.length > 0) {
-                likeButtons.forEach(button => {
-                    button.addEventListener('click', function (event) {
-                        event.preventDefault(); // prevent form submission/reload
-
-                        const form = this.closest('form');
-                        const formData = new FormData(form);
-
-                        fetch(form.action, {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (!data.message) return; // no message to show
-
-                                // Show flash message
-                                const flashContainer = document.querySelector('.flash-messages');
-                                if (!flashContainer) return;
-
-                                const flashDiv = document.createElement('div');
-                                flashDiv.className = `flash ${data.status}`;
-                                flashDiv.textContent = data.message;
-                                flashContainer.appendChild(flashDiv);
-
-                                // Auto-hide after 3 seconds
-                                setTimeout(() => {
-                                    flashDiv.style.transition = 'opacity 0.5s ease-out';
-                                    flashDiv.style.opacity = '0';
-                                    setTimeout(() => flashDiv.remove(), 500);
-                                }, 3000);
-                            })
-                            .catch(error => {
-                                console.error('Error liking movie:', error);
-                            });
-                    });
-                });
+                }, 1000);
             }
         });
     </script>
