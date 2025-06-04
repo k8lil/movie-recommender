@@ -34,14 +34,18 @@
     <main>
         <div class="container">
 
-            <div class="flash-messages">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                {% for category, message in messages %}
-                <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-                {% endif %}
-                {% endwith %}
+            <!-- Flash message container (it will show after a successful like) -->
+            <div id="flash-message" style="display: none; 
+                                        position: fixed; 
+                                        top: 10px; 
+                                        left: 50%; 
+                                        transform: translateX(-50%);
+                                        padding: 10px; 
+                                        background-color: #d4edda; 
+                                        color: #155724; 
+                                        border-radius: 5px; 
+                                        z-index: 9999;">
+                <span id="flash-message-text"></span>
             </div>
 
             <form action="{{ url_for('recommend') }}" method="POST" class="search-form">
@@ -69,9 +73,14 @@
                         {% if movie.release_date %}
                         <span class="release-year">({{ movie.release_date[:4] }})</span>
                         {% endif %}
-                        {% if movie.overview %}
                         <p class="movie-overview">{{ movie.overview }}</p>
-                        {% endif %}
+
+                        <!-- Heart Icon Button to Add to Favorites -->
+                        <form class="like-form" data-movie-title="{{ movie.title }}">
+                            <button type="button" class="heart-btn">
+                                <i class="fas fa-heart"></i> 
+                            </button>
+                        </form>
                     </div>
                 </li>
                 {% endfor %}
@@ -80,19 +89,29 @@
         </div>
     </main>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Add jQuery -->
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            // Auto-hide flash messages after 3 seconds
-            const flashMessages = document.querySelectorAll('.flash-messages .flash');
-            if (flashMessages.length > 0) {
-                setTimeout(() => {
-                    flashMessages.forEach(msg => {
-                        msg.style.transition = 'opacity 0.5s ease-out';
-                        msg.style.opacity = '0';
-                        setTimeout(() => msg.remove(), 500);
-                    });
-                }, 1000);
-            }
+        // Handle the heart button click using AJAX
+        $(document).on('click', '.heart-btn', function() {
+            var movieTitle = $(this).closest('.like-form').data('movie-title'); // Get movie title
+
+            $.ajax({
+                url: '{{ url_for("like_movie") }}',  // The route for adding to favorites
+                method: 'POST',
+                data: {
+                    movie_title: movieTitle
+                },
+                success: function(response) {
+                    // Show flash message
+                    $('#flash-message-text').text(response.message);  // Set the message
+                    $('#flash-message').fadeIn().delay(3000).fadeOut();  // Show message for 3 seconds
+                },
+                error: function(error) {
+                    // Show error message if any error occurs
+                    $('#flash-message-text').text('An error occurred. Please try again.');
+                    $('#flash-message').fadeIn().delay(3000).fadeOut();
+                }
+            });
         });
     </script>
 </body>

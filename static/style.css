@@ -166,17 +166,17 @@ main h2 {
 
 /* Movie item card style */
 .movie-item {
-    position: relative; /* Set relative positioning on the movie card */
+    position: relative;
     background-color: #f8f8f8;
-    border-radius: 12px;  /* Rounded corners */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);  /* Slightly larger shadow for depth */
-    width: 240px;  /* Increase width for a bigger card */
-    height: 450px;  /* Increased height for better balance */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 200px;
+    height: 400px;  
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    margin: 10px;  /* Margin around cards */
+    transition: transform 0.2s ease;
+    margin: 10px;
 }
 
 .movie-item:hover {
@@ -282,7 +282,6 @@ main h2 {
     font-size: 1.7rem;
     cursor: pointer;
     transition: color 0.3s ease;
-}
 }
 
 .heart-btn:hover {

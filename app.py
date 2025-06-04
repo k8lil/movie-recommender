@@ -118,6 +118,7 @@ def like_movie():
     return jsonify({'status': 'success', 'message': f'You liked "{movie_title}".'})
 
 
+
 @app.route('/favorites')
 @login_required
 def favorites():
@@ -245,8 +246,9 @@ def recommend():
     }
     rec_response = requests.get(rec_url, params=rec_params)
     rec_data = rec_response.json()
-    recommendations = rec_data.get('results', [])  # limit to 8 results
+    recommendations = rec_data.get('results', [])  
 
+    # Format movies for the template
     movies = [{
         'title': movie['title'],
         'id': movie['id'],
@@ -254,6 +256,7 @@ def recommend():
     } for movie in recommendations]
 
     return render_template('index.html', recommendations=movies, input_title=movie_title)
+
 
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required

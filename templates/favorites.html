@@ -22,16 +22,23 @@
 
     <main>
         <div class="container">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            <div class="flash-messages">
-                {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
+
+            <!-- Flash message container for remove success -->
+            <div id="flash-message" style="display: none; 
+                                           position: fixed; 
+                                           top: 10px; 
+                                           left: 50%; 
+                                           transform: translateX(-50%);
+                                           padding: 10px; 
+                                           background-color: #d4edda; 
+                                           color: #155724; 
+                                           border-radius: 5px; 
+                                           z-index: 9999;">
+                <span id="flash-message-text"></span>
             </div>
-            {% endif %}
-            {% endwith %}
+
             <h2>Your Favorites</h2>
+
             {% if liked_movies %}
             <ul class="recommendations">
                 {% for movie in liked_movies %}
@@ -60,6 +67,21 @@
             {% endif %}
         </div>
     </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Check if flash messages exist and display them
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                // Display the flash message if available
+                var flashMessage = "{{ messages[0] }}";
+                $('#flash-message-text').text(flashMessage);  // Set the message
+                $('#flash-message').fadeIn().delay(3000).fadeOut();  // Show message for 3 seconds
+            {% endif %}
+            {% endwith %}
+        });
+    </script>
 </body>
 
 </html>
