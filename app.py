@@ -8,6 +8,8 @@ from models import Movie
 import requests
 from flask import request, render_template
 
+TMDB_API_KEY = 'e454138589053ddd5a2dd061e3e35ac5'
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SECRET_KEY'] = 'supersecretkey'
@@ -115,27 +117,65 @@ def like_movie():
 
     return jsonify({'status': 'success', 'message': f'You liked "{movie_title}".'})
 
+
 @app.route('/favorites')
 @login_required
 def favorites():
+    # Retrieve liked movies for the current user from the UserPreference table
     liked_movies = UserPreference.query.filter_by(user_id=current_user.id).all()
-    return render_template('favorites.html', liked_movies=liked_movies)
+
+    # Prepare a list of movie details
+    movies = []
+    for preference in liked_movies:
+        # Fetch movie details from TMDB using the movie title
+        movie_details = get_movie_details(preference.movie_title)
+        if movie_details:
+            movie_details['id'] = preference.id  # Add the ID from the UserPreference table
+            movies.append(movie_details)
+
+    return render_template('favorites.html', liked_movies=movies)
+
+
+def get_movie_details(movie_title):
+    # Fetch movie details from TMDB API using the movie title
+    url = 'https://api.themoviedb.org/3/search/movie'
+    params = {
+        'api_key': 'e454138589053ddd5a2dd061e3e35ac5',  # Use your own TMDB API key
+        'query': movie_title,
+        'language': 'en-US',
+        'page': 1,
+        'include_adult': False
+    }
+
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        results = data.get('results')
+        if results:
+            movie = results[0]  # Get the first result
+            return {
+                'title': movie['title'],
+                'poster_path': movie.get('poster_path'),
+                'release_date': movie.get('release_date'),
+                'overview': movie.get('overview', 'No description available.')
+            }
+    return None
+
 
 @app.route('/remove_favorite/<int:movie_id>', methods=['POST'])
 @login_required
 def remove_favorite(movie_id):
+    # Find the movie in UserPreference using movie_id
     preference = UserPreference.query.filter_by(user_id=current_user.id, id=movie_id).first()
 
     if preference:
-        db.session.delete(preference)
+        db.session.delete(preference)  # Remove movie from favorites
         db.session.commit()
         flash('Movie removed from favorites.', 'success')
     else:
         flash('Favorite not found.', 'error')
 
     return redirect(url_for('favorites'))
-
-TMDB_API_KEY = 'e454138589053ddd5a2dd061e3e35ac5'
 
 @app.route('/search', methods=['GET'])
 def search():
@@ -214,6 +254,39 @@ def recommend():
     } for movie in recommendations]
 
     return render_template('index.html', recommendations=movies, input_title=movie_title)
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    if request.method == 'POST':
+        new_username = request.form['username']
+        new_password = request.form['password']
+
+        # Update the username if it's different
+        if new_username != current_user.username:
+            current_user.username = new_username
+
+        # Update the password if provided
+        if new_password:
+            current_user.set_password(new_password)
+
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('profile'))
+
+    return render_template('profile.html')
+
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password_request():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.query.filter_by(email=email).first()
+        if user:
+            # Send reset email (this will be added in a later step)
+            flash('Password reset link sent!', 'success')
+        else:
+            flash('No account with that email found.', 'danger')
+    return render_template('reset_password_request.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -14,7 +14,7 @@ body {
 
 .container {
     width: 90%;
-    max-width: 700px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 2rem 0;
 }
@@ -83,8 +83,9 @@ main h2 {
 /* Search form */
 .search-form {
     display: flex;
-    gap: 0.5rem;
+    gap: 1rem;
     margin-bottom: 1.5rem;
+    justify-content: center;
 }
 
 .search-form input[type="text"] {
@@ -93,6 +94,8 @@ main h2 {
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1rem;
+    width: 100%;
+    max-width: 400px;
 }
 
 .search-form button {
@@ -150,42 +153,159 @@ main h2 {
     border: 1px solid #f5c6cb;
 }
 
-/* Alert styles */
-.alert {
-    padding: 0.75rem 1rem;
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
+/* Recommendations list - card/grid style */
+.recommendations {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 2rem;
+    justify-content: center;
 }
 
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+/* Movie item card style */
+.movie-item {
+    position: relative; /* Set relative positioning on the movie card */
+    background-color: #f8f8f8;
+    border-radius: 12px;  /* Rounded corners */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);  /* Slightly larger shadow for depth */
+    width: 240px;  /* Increase width for a bigger card */
+    height: 450px;  /* Increased height for better balance */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin: 10px;  /* Margin around cards */
 }
 
-.alert-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+.movie-item:hover {
+    transform: translateY(-8px);  /* More noticeable hover effect */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);  /* Stronger shadow on hover */
 }
 
-/* Button danger (remove favorite) */
-.btn.btn-danger {
+/* Poster image */
+.movie-poster {
+    width: 100%;
+    height: 280px;  /* Adjusted height */
+    object-fit: cover;
+    display: block;
+    border-bottom: 3px solid #eee;  /* Border between image and info */
+}
+
+.movie-poster-placeholder {
+    width: 100%;
+    height: 280px;  /* Adjusted to match poster size */
+    background-color: #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Movie info container */
+.movie-info {
+    padding: 1rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Ensures elements are spaced */
+}
+
+/* Movie title */
+.movie-info h3 {
+    margin: 0;
+    font-size: 1.3rem;  /* Larger title font */
+    color: #222;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+/* Release year */
+.release-year {
+    color: #888;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+/* Remove Favorite button */
+.remove-favorite-btn {
+    position: absolute;
+    bottom: 15px;  /* Moved to the bottom */
+    right: 15px;
     background: none;
     border: none;
     color: #e74c3c;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.3rem;
     padding-left: 5px;
     transition: color 0.3s ease;
 }
 
-.btn.btn-danger:hover {
+.remove-favorite-btn:hover {
     color: #c0392b;
 }
 
-.btn.btn-danger:focus {
+.remove-favorite-btn:focus {
     outline: none;
+}
+
+/* Like button style */
+.like-form {
+    display: flex;
+    align-items: start;
+    margin-left: auto;
+}
+
+.like-btn {
+    background: none;
+    border: none;
+    font-size: 1.4em;
+    color: #e74c3c;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.like-btn:hover {
+    transform: scale(1.2);
+}
+
+/* Heart button styling */
+.heart-btn {
+ position: absolute;
+    top: 15px;  /* Moved closer to the top */
+    left: 15px;
+    background: none;
+    border: none;
+    color: #e74c3c;
+    font-size: 1.7rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+}
+
+.heart-btn:hover {
+     color: #c0392b;
+}
+
+/* Heart icon */
+.heart-btn i {
+    margin-right: 5px;
+}
+
+
+/* Recommendations section */
+.recommendations-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.search-container {
+    margin-bottom: 2rem;
+    text-align: center;
 }
 
 /* Auth form (login/register) */
@@ -222,6 +342,82 @@ main h2 {
 
 .auth-form button:hover {
     background-color: #45a049;
+}
+
+/* Favorites Page */
+.recommendations {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.recommendations li {
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    width: 230px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.recommendations li:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.movie-poster {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    display: block;
+}
+
+.movie-poster-placeholder {
+    width: 230px;
+    height: 300px;
+    background-color: #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.movie-info {
+    padding: 0.5rem 1rem 1rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.movie-info h3 {
+    margin: 0.5rem 0 0.2rem;
+    font-size: 1.1rem;
+    color: #222;
+}
+
+.release-year {
+    color: #888;
+    font-size: 0.95em;
+    margin-left: 0.4em;
+}
+
+.movie-overview {
+    font-size: 0.9rem;
+    color: #333;
+    margin-top: 0.5em;
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 4.5em;
+    line-height: 1.5em;
+    /* ~3 lines */
 }
 
 /* Header (main-header) with search */
@@ -273,100 +469,4 @@ main h2 {
 
 .header-search-form button:hover {
     background-color: #45a049;
-}
-
-/* Recommendations list - card/grid style */
-.recommendations {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 1rem;
-    justify-content: center;
-}
-
-.movie-item {
-    background-color: #f8f8f8;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    width: 200px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s ease;
-}
-
-.movie-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
-}
-
-.movie-poster {
-    width: 100%;
-    height: 300px;
-    object-fit: cover;
-    display: block;
-}
-
-.movie-poster-placeholder {
-    width: 200px;
-    height: 300px;
-    background-color: #ddd;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #666;
-    font-size: 0.9rem;
-}
-
-.movie-info {
-    padding: 0.5rem 1rem 1rem;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.movie-info h3 {
-    margin: 0.5rem 0 0.2rem;
-    font-size: 1.1rem;
-    color: #222;
-}
-
-.release-year {
-    color: #888;
-    font-size: 0.95em;
-    margin-left: 0.4em;
-}
-
-.movie-overview {
-    font-size: 0.9rem;
-    color: #333;
-    margin-top: 0.5em;
-    flex-grow: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-height: 4.5em;
-    /* ~3 lines */
-    line-height: 1.5em;
-}
-
-/* Like button style */
-.like-form {
-    display: flex;
-    align-items: start;
-    margin-left: auto;
-}
-
-.like-btn {
-    background: none;
-    border: none;
-    font-size: 1.4em;
-    color: #e74c3c;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.like-btn:hover {
-    transform: scale(1.2);
 }

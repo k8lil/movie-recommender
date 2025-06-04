@@ -5,8 +5,8 @@
     <meta charset="UTF-8" />
     <title>Search Results - Movie Recommender</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-        integrity="..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Add jQuery -->
 </head>
 
 <body>
@@ -14,7 +14,7 @@
         <div class="container">
             <h1><a href="{{ url_for('home') }}" style="color: inherit; text-decoration: none;">Movie Recommender</a></h1>
             <form action="{{ url_for('search') }}" method="get" class="header-search-form">
-                <input type="text" name="query" placeholder="Search movies..." required />
+                <input type="text" name="query" value="{{ input_title }}" placeholder="Search movies..." required />
                 <button type="submit"><i class="fas fa-search"></i></button>
             </form>
         </div>
@@ -36,7 +36,13 @@
                 <div class="movie-info">
                     <h3>{{ movie.title }}</h3>
                     <p><small>Release Date: {{ movie.release_date or "N/A" }}</small></p>
-                    <p>{{ movie.overview or "No description available." }}</p>
+
+                    <!-- Heart Icon Button to Add to Favorites -->
+                    <form class="like-form" data-movie-title="{{ movie.title }}">
+                        <button type="button" class="heart-btn">
+                            <i class="fas fa-heart"></i> 
+                        </button>
+                    </form>
                 </div>
             </li>
             {% endfor %}
@@ -45,6 +51,47 @@
         <p>No results found.</p>
         {% endif %}
     </div>
+
+    <!-- Flash message container (it will show after a successful like) -->
+    <div id="flash-message" style="display: none; 
+                                   position: fixed; 
+                                   top: 10px; 
+                                   left: 50%; 
+                                   transform: translateX(-50%);
+                                   padding: 10px; 
+                                   background-color: #d4edda; 
+                                   color: #155724; 
+                                   border-radius: 5px; 
+                                   z-index: 9999;">
+        <span id="flash-message-text"></span>
+    </div>
+
+    <script>
+        // Handle the heart button click using AJAX
+        $(document).on('click', '.heart-btn', function() {
+            var movieTitle = $(this).closest('.like-form').data('movie-title'); // Get movie title
+
+            $.ajax({
+                url: '{{ url_for("like_movie") }}',
+                method: 'POST',
+                data: {
+                    movie_title: movieTitle
+                },
+                success: function(response) {
+                    console.log('Movie added to favorites:', movieTitle);
+                    // Show flash message
+                    $('#flash-message-text').text(response.message);  // Set the message
+                    $('#flash-message').fadeIn().delay(3000).fadeOut();  // Show message for 3 seconds
+                },
+                error: function(error) {
+                    console.log('Error adding movie to favorites:', error);
+                    // Show error message
+                    $('#flash-message-text').text('An error occurred. Please try again.');
+                    $('#flash-message').fadeIn().delay(3000).fadeOut();
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

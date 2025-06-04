@@ -34,13 +34,22 @@
             <h2>Your Favorites</h2>
             {% if liked_movies %}
             <ul class="recommendations">
-                {% for item in liked_movies %}
-                <li>
-                    {{ item.movie_title }}
-                    <form action="{{ url_for('remove_favorite', movie_id=item.id) }}" method="post"
-                        style="display:inline;">
-                        <button type="submit" class="btn btn-danger" title="Remove favorite">
-                            <i class="fas fa-trash"></i>
+                {% for movie in liked_movies %}
+                <li class="movie-item">
+                    {% if movie.poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w200{{ movie.poster_path }}" alt="{{ movie.title }} poster"
+                        class="movie-poster" />
+                    {% else %}
+                    <div class="movie-poster-placeholder">No Image</div>
+                    {% endif %}
+                    <div class="movie-info">
+                        <h3>{{ movie.title }}</h3>
+                    </div>
+
+                    <!-- Trash bin button placed at bottom right of the card -->
+                    <form action="{{ url_for('remove_favorite', movie_id=movie.id) }}" method="POST">
+                        <button type="submit" class="remove-favorite-btn">
+                            <i class="fas fa-trash"></i> 
                         </button>
                     </form>
                 </li>
